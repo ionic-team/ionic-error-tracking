@@ -1,0 +1,31 @@
+{
+  "name": "@ionic/monitor",
+  "version": "0.0.1",
+  "homepage": "http://ionicframework.com/",
+  "author": "Ionic Team <hi@ionic.io> (http://ionic.io)",
+  "license": "MIT",
+  "files": [
+    "dist/",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "npm run clean && tsc && npm run minify",
+    "minify": "uglifyjs dist/index.js -o dist/ion-monitor.js --compress --mangle && rm dist/index.js",
+    "clean": "rimraf ./dist"
+  },
+  "main": "dist/ion-monitor.js",
+  "devDependencies": {
+    "rimraf": "^2.6.1",
+    "tracekit": "^0.4.4",
+    "typescript": "~2.2.1",
+    "uglify-js": "2.8.16"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/driftyco/ionic-monitor.git"
+  },
+  "bugs": {
+    "url": "https://github.com/driftyco/ionic-monitor/issues"
+  }
+}

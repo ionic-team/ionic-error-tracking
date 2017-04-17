@@ -10,7 +10,7 @@
     "README.md"
   ],
   "scripts": {
-    "build": "npm run clean && tsc && npm run concat",
+    "build": "npm run clean && tsc && npm run concat && npm run minify",
     "concat": "cat node_modules/tracekit/tracekit.js dist/index.js > dist/bundle.js",
     "minify": "uglifyjs dist/bundle.js -o dist/ion-monitor.js --compress --mangle && rm dist/index.js",
     "clean": "rimraf ./dist"

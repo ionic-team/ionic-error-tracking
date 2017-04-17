@@ -1,9 +1,17 @@
-
 (function(window: any){
 
   const ionic: Ionic = window.Ionic = window.Ionic || {};
   const queue: any[] = [];
   let timerId: any;
+
+  window.onerror = function(msg: any, url: any, lineNo: any, columnNo: any, err: any) {
+    handleError(err);
+  };
+
+  // Subscribe to TraceKit errors
+  window.TraceKit.report.subscribe((errorReport: any) => {
+  });
+
 
   function handleError(err: any) {
 
@@ -19,11 +27,19 @@
       drainQueue();
     }, 2000);
   }
+  ionic.handleError = handleError;
+
 
   function cleanError(err: any) {
-    // Ignore HTTP errors
-    if (!err || err.url || err.headers) {
-      return null;
+    // handle HTTP errors differently
+    if(err.url || err.headers) {
+      err.isHttp = true;
+    }
+
+    let stack = err.stack;
+    for(let frame of stack) {
+      frame.context = null;
+      delete frame.context;
     }
 
     return err;
@@ -32,16 +48,80 @@
   function drainQueue() {
     const errMsg = JSON.stringify(queue);
 
-    console.error(errMsg);
+    let event = 'load';
+    if(window.cordova) {
+      event = 'deviceready';
+    }
+
+    window.addEventListener(event, () => {
+      let deviceInfo = this.getDeviceInfo().then((deviceInfo: any) => {
+        window.fetch('http://localhost:7000/tracking/exceptions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            app_id: 'df3a2702',
+            framework: 'angular',
+            device: deviceInfo,
+            errors: errMsg
+          })
+        });
+      });
+    });
 
     queue.length = 0;
   }
 
-  ionic.handleError = handleError;
+  // Collect browser information
+  function getBrowserInfo() {
+    let n = window.navigator;
+    return {
+      browserProduct: n.product,
+      browserAppVersion: n.appVersion,
+      browserUserAgent: n.userAgent,
+      browserPlatform: n.platform,
+      browserLanguage: n.language,
+      browserAppName: n.appName,
+      browserAppCodeName: n.appCodeName,
+      viewportWidth: Math.max(document.documentElement.clientWidth, window.innerWidth || 0),
+      viewportHeight: Math.max(document.documentElement.clientHeight, window.innerHeight || 0),
+      utcOffset: -(new Date().getTimezoneOffset()/60)
+    }
+  }
 
-  window.onerror = function(msg: any, url: any, lineNo: any, columnNo: any, err: any) {
-    handleError(err);
-  };
+  // Collect device information, including native device data if available
+  function getDeviceInfo() {
+    return new Promise((resolve, reject) => {
+      var info = {};
+
+      // Try to grab some device info
+      var d = window.device;
+      if(d) {
+        info = {
+          model: d.model,
+          platform: d.platform,
+          uuid: d.uuid,
+          osVersion: d.version,
+          serial: d.serial,
+          manufacturer: d.manufacturer,
+          isNative: true
+        };
+      }
+
+      // Grab app info from the native side
+      if(!window.IonicCordovaCommon) {
+        return resolve(this.getBrowserInfo());
+      }
+
+      window.IonicCordovaCommon.getAppInfo((appInfo: any) => {
+        let newInfo = Object.assign(info, appInfo);
+        resolve(newInfo);
+      }, (err: any) => {
+        reject(err);
+      });
+    });
+  }
 
 })(window);
 

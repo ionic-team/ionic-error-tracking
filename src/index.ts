@@ -1,6 +1,7 @@
 (function(window: any){
 
   const ionic: Ionic = window.Ionic = window.Ionic || {};
+
   const queue: any[] = [];
   let timerId: any;
   let deviceInfo: any;
@@ -21,6 +22,7 @@
     handleError(errorReport);
   });
 
+
   function handleError(err: any) {
     err = cleanError(err);
     if (!err) {
@@ -33,8 +35,10 @@
       drainQueue();
     }, 2000);
   }
-  ionic.handleError = handleError;
 
+  function handleNewError(err: any) {
+    window.TraceKit.report(err);
+  }
 
   function cleanError(err: any) {
     // handle HTTP errors differently
@@ -127,9 +131,12 @@
     });
   }
 
+  ionic.handleError = handleError;
+  ionic.handleNewError = handleNewError;
 })(window);
 
 
 interface Ionic {
   handleError: {(error: any): void};
+  handleNewError: {(error: any): void};
 }

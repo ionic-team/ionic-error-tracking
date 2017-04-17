@@ -3,4 +3,9 @@ console.log("Hello Moto");
 function errorOut() {
   throw new Error();
 }
-errorOut();
+
+function httpError() {
+  window.fetch('http://localhost:5999/wut');
+}
+httpError();
+//errorOut();

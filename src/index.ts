@@ -3,23 +3,29 @@
   const ionic: Ionic = window.Ionic = window.Ionic || {};
   const queue: any[] = [];
   let timerId: any;
+  let deviceInfo: any;
 
-  window.onerror = function(msg: any, url: any, lineNo: any, columnNo: any, err: any) {
-    handleError(err);
-  };
-
-  // Subscribe to TraceKit errors
-  window.TraceKit.report.subscribe((errorReport: any) => {
+  let loadEvent = 'load';
+  if(window.cordova) {
+    loadEvent = 'deviceready';
+  }
+  window.addEventListener(loadEvent, () => {
+    getDeviceInfo().then((info: any) => {
+      deviceInfo = info;
+    });
   });
 
+  window.TraceKit.remoteFetching = false;
+
+  window.TraceKit.report.subscribe(function(errorReport: any) {
+    handleError(errorReport);
+  });
 
   function handleError(err: any) {
-
     err = cleanError(err);
     if (!err) {
       return;
     }
-
     queue.push(err);
 
     clearTimeout(timerId);
@@ -32,9 +38,14 @@
 
   function cleanError(err: any) {
     // handle HTTP errors differently
+    let newStack = window.TraceKit.computeStackTrace(err);
+    err.stack = newStack;
+
     if(err.url || err.headers) {
       err.isHttp = true;
     }
+
+    err.timestamp = new Date;
 
     let stack = err.stack;
     for(let frame of stack) {
@@ -46,28 +57,21 @@
   }
 
   function drainQueue() {
-    const errMsg = JSON.stringify(queue);
+    let errorMsg = JSON.stringify(queue);
 
-    let event = 'load';
-    if(window.cordova) {
-      event = 'deviceready';
-    }
+    console.log('ERROR MSG', errorMsg);
 
-    window.addEventListener(event, () => {
-      let deviceInfo = this.getDeviceInfo().then((deviceInfo: any) => {
-        window.fetch('http://localhost:7000/tracking/exceptions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            app_id: 'df3a2702',
-            framework: 'angular',
-            device: deviceInfo,
-            errors: errMsg
-          })
-        });
-      });
+    window.fetch('http://localhost:7000/tracking/exceptions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        app_id: 'df3a2702',
+        framework: 'angular',
+        device: deviceInfo,
+        errors: errorMsg
+      })
     });
 
     queue.length = 0;
@@ -111,7 +115,7 @@
 
       // Grab app info from the native side
       if(!window.IonicCordovaCommon) {
-        return resolve(this.getBrowserInfo());
+        return resolve(getBrowserInfo());
       }
 
       window.IonicCordovaCommon.getAppInfo((appInfo: any) => {

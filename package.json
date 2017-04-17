@@ -10,8 +10,9 @@
     "README.md"
   ],
   "scripts": {
-    "build": "npm run clean && tsc && npm run minify",
-    "minify": "uglifyjs dist/index.js -o dist/ion-monitor.js --compress --mangle && rm dist/index.js",
+    "build": "npm run clean && tsc && npm run concat",
+    "concat": "cat node_modules/tracekit/tracekit.js dist/index.js > dist/bundle.js",
+    "minify": "uglifyjs dist/bundle.js -o dist/ion-monitor.js --compress --mangle && rm dist/index.js",
     "clean": "rimraf ./dist"
   },
   "main": "dist/ion-monitor.js",
@@ -27,5 +28,8 @@
   },
   "bugs": {
     "url": "https://github.com/driftyco/ionic-monitor/issues"
+  },
+  "dependencies": {
+    "tracekit": "^0.4.4"
   }
 }

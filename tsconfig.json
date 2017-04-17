@@ -5,6 +5,7 @@
     "module": "es2015",
     "outDir": "dist/",
     "target": "es5",
-    "noImplicitAny": true
+    "noImplicitAny": true,
+    "compileOnSave": false
   }
 }

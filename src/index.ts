@@ -61,20 +61,16 @@
   }
 
   function drainQueue() {
-    let errorMsg = JSON.stringify(queue);
-
-    console.log('ERROR MSG', errorMsg);
-
     window.fetch('http://localhost:7000/tracking/exceptions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        app_id: 'df3a2702',
+        app_id: '3c295c3e',
         framework: 'angular',
         device: deviceInfo,
-        errors: errorMsg
+        errors: queue.slice()
       })
     });
 

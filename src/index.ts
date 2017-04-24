@@ -3,6 +3,10 @@ interface Ionic {
   handleNewError: {(error: any): void};
 }
 
+interface IonicHandlerMeta {
+  framework: string
+}
+
 (function(window: any) {
 
   const ionic: Ionic = window.Ionic = window.Ionic || {};
@@ -10,6 +14,7 @@ interface Ionic {
   const queue: any[] = [];
   let timerId: any;
   let deviceInfo: any;
+  let appId = getAppId();
 
   let loadEvent = 'load';
   if(window.cordova) {
@@ -26,6 +31,16 @@ interface Ionic {
   window.TraceKit.report.subscribe(function(errorReport: any) {
     handleError(errorReport);
   });
+
+  function getAppId() {
+    let scripts = document.querySelectorAll('script');
+    for(let i = 0; i < scripts.length; i++) {
+      let script = scripts[i];
+      if(script.src.indexOf('ion-monitor') >= 0) {
+        return script.getAttribute('data-app-id');
+      }
+    }
+  }
 
 
   function handleError(err: any) {
@@ -66,14 +81,16 @@ interface Ionic {
   }
 
   function drainQueue() {
+    let framework = window.angular ? 'angular1' : 'angular2';
+
     window.fetch('http://localhost:7000/tracking/exceptions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        app_id: '3c295c3e',
-        framework: 'angular',
+        app_id: appId,
+        framework: framework,
         device: deviceInfo,
         errors: queue.slice()
       })
@@ -144,7 +161,9 @@ interface Ionic {
         return function(exception: any, cause: any) {
           $delegate(exception, cause);
           exception.message = exception.stack;
-          window.Ionic.handleNewError(exception);
+          window.Ionic.handleNewError(exception, {
+            framework: 'angular1'
+          });
         };
       }]);
     }]);

@@ -15,6 +15,9 @@ interface IonicHandlerMeta {
   let timerId: any;
   let deviceInfo: any;
   let appId = getAppId();
+  let devMode = getIsDevMode();
+
+  console.log('Ionic Error Logging - App: ', appId, ' Dev mode?', devMode);
 
   let loadEvent = 'load';
   if(window.cordova) {
@@ -32,14 +35,24 @@ interface IonicHandlerMeta {
     handleError(errorReport);
   });
 
-  function getAppId() {
+  function getScriptElement() {
     let scripts = document.querySelectorAll('script');
     for(let i = 0; i < scripts.length; i++) {
       let script = scripts[i];
       if(script.src.indexOf('ion-monitor') >= 0) {
-        return script.getAttribute('data-app-id');
+        return script;
       }
     }
+  }
+
+  function getAppId() {
+    let script = getScriptElement();
+    return script && script.getAttribute('data-app-id');
+  }
+
+  function getIsDevMode() {
+    let script = getScriptElement();
+    return script && (script.getAttribute('data-dev') === "true")
   }
 
 

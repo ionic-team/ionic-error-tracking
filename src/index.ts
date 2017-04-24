@@ -1,4 +1,9 @@
-(function(window: any){
+interface Ionic {
+  handleError: {(error: any): void};
+  handleNewError: {(error: any): void};
+}
+
+(function(window: any) {
 
   const ionic: Ionic = window.Ionic = window.Ionic || {};
 
@@ -129,10 +134,19 @@
 
   ionic.handleError = handleError;
   ionic.handleNewError = handleNewError;
+
+  if(window.angular) {
+
+    window.angular.module('ionic')
+
+    .config(['$provide', function($provide: any) {
+      $provide.decorator('$exceptionHandler', ['$delegate', function($delegate: any) {
+        return function(exception: any, cause: any) {
+          $delegate(exception, cause);
+          exception.message = exception.stack;
+          window.Ionic.handleNewError(exception);
+        };
+      }]);
+    }]);
+  }
 })(window);
-
-
-interface Ionic {
-  handleError: {(error: any): void};
-  handleNewError: {(error: any): void};
-}

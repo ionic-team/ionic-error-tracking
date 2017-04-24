@@ -16,18 +16,24 @@ interface IonicHandlerMeta {
   let deviceInfo: any;
   let appId = getAppId();
   let devMode = getIsDevMode();
+  let apiUrl = getApiUrl();
 
   console.log('Ionic Error Logging - App: ', appId, ' Dev mode?', devMode);
 
-  let loadEvent = 'load';
   if(window.cordova) {
-    loadEvent = 'deviceready';
-  }
-  window.addEventListener(loadEvent, () => {
-    getDeviceInfo().then((info: any) => {
-      deviceInfo = info;
+    console.log('Getting device ready after deviceReady');
+    document.addEventListener('deviceready', () => {
+      getDeviceInfo().then((info: any) => {
+        deviceInfo = info;
+      });
     });
-  });
+  } else {
+    window.addEventListener('load', () => {
+      getDeviceInfo().then((info: any) => {
+        deviceInfo = info;
+      });
+    });
+  }
 
   window.TraceKit.remoteFetching = false;
 
@@ -55,6 +61,12 @@ interface IonicHandlerMeta {
     return script && (script.getAttribute('data-dev') === "true")
   }
 
+  function getApiUrl() {
+    if(getIsDevMode()) {
+      return 'http://localhost:7000';
+    }
+    return 'https://api.ionic.io';
+  }
 
   function handleError(err: any) {
     err = cleanError(err);
@@ -66,7 +78,7 @@ interface IonicHandlerMeta {
     clearTimeout(timerId);
     timerId = setTimeout(() => {
       drainQueue();
-    }, 2000);
+    }, 1000);
   }
 
   function handleNewError(err: any) {
@@ -96,7 +108,7 @@ interface IonicHandlerMeta {
   function drainQueue() {
     let framework = window.angular ? 'angular1' : 'angular2';
 
-    window.fetch('http://localhost:7000/tracking/exceptions', {
+    window.fetch(apiUrl + '/tracking/exceptions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -148,12 +160,16 @@ interface IonicHandlerMeta {
         };
       }
 
+      Object.assign(info, getBrowserInfo());
+
       // Grab app info from the native side
       if(!window.IonicCordovaCommon) {
-        return resolve(getBrowserInfo());
+        console.log('No Cordova common');
+        return resolve(info);
       }
 
       window.IonicCordovaCommon.getAppInfo((appInfo: any) => {
+        console.log('Got native cordova common', appInfo);
         let newInfo = Object.assign(info, appInfo);
         resolve(newInfo);
       }, (err: any) => {
@@ -174,9 +190,7 @@ interface IonicHandlerMeta {
         return function(exception: any, cause: any) {
           $delegate(exception, cause);
           exception.message = exception.stack;
-          window.Ionic.handleNewError(exception, {
-            framework: 'angular1'
-          });
+          window.Ionic.handleNewError(exception);
         };
       }]);
     }]);

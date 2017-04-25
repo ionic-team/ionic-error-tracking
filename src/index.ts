@@ -21,7 +21,6 @@ interface IonicHandlerMeta {
   console.log('Ionic Error Logging - App: ', appId, ' Dev mode?', devMode);
 
   if(window.cordova) {
-    console.log('Getting device ready after deviceReady');
     document.addEventListener('deviceready', () => {
       getDeviceInfo().then((info: any) => {
         deviceInfo = info;
@@ -164,12 +163,10 @@ interface IonicHandlerMeta {
 
       // Grab app info from the native side
       if(!window.IonicCordovaCommon) {
-        console.log('No Cordova common');
         return resolve(info);
       }
 
       window.IonicCordovaCommon.getAppInfo((appInfo: any) => {
-        console.log('Got native cordova common', appInfo);
         let newInfo = Object.assign(info, appInfo);
         resolve(newInfo);
       }, (err: any) => {

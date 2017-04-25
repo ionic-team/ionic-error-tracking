@@ -1,7 +1,7 @@
 {
   "name": "ionic-error-tracking",
   "description": "Ionic tracking client for Ionic apps",
-  "main": "dist/ion-monitor.js",
+  "main": "dist/ion-error-tracking.js",
   "authors": [
     "Ionic Team <hi@ionic.io> (http://ionic.io)"
   ],

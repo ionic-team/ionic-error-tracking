@@ -3,9 +3,6 @@ interface Ionic {
   handleNewError: {(error: any): void};
 }
 
-interface IonicHandlerMeta {
-  framework: string
-}
 
 (function(window: any) {
 

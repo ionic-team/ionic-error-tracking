@@ -1273,7 +1273,7 @@ if (typeof module !== 'undefined' && module.exports && window.module !== module)
         var scripts = document.querySelectorAll('script');
         for (var i = 0; i < scripts.length; i++) {
             var script = scripts[i];
-            if (script.src.indexOf('ion-monitor') >= 0) {
+            if (script.src.indexOf('ionic-error-tracking') >= 0) {
                 return script;
             }
         }

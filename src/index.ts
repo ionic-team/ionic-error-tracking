@@ -41,7 +41,7 @@ interface Ionic {
     let scripts = document.querySelectorAll('script');
     for(let i = 0; i < scripts.length; i++) {
       let script = scripts[i];
-      if(script.src.indexOf('ion-monitor') >= 0) {
+      if(script.src.indexOf('ionic-error-tracking') >= 0) {
         return script;
       }
     }

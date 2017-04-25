@@ -12,10 +12,10 @@
   "scripts": {
     "build": "npm run clean && tsc && npm run concat && npm run minify",
     "concat": "cat node_modules/tracekit/tracekit.js dist/index.js > dist/bundle.js",
-    "minify": "uglifyjs dist/bundle.js -o dist/ion-error-tracking.js --compress --mangle && rm dist/index.js",
+    "minify": "uglifyjs dist/bundle.js -o dist/ionic-error-tracking.js --compress --mangle && rm dist/index.js",
     "clean": "rimraf ./dist"
   },
-  "main": "dist/ion-error-tracking.js",
+  "main": "dist/ionic-error-tracking.js",
   "devDependencies": {
     "rimraf": "^2.6.1",
     "tracekit": "^0.4.4",

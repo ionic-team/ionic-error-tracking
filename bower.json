@@ -1,7 +1,7 @@
 {
   "name": "ionic-error-tracking",
   "description": "Ionic tracking client for Ionic apps",
-  "main": "dist/ion-error-tracking.js",
+  "main": "dist/ionic-error-tracking.js",
   "authors": [
     "Ionic Team <hi@ionic.io> (http://ionic.io)"
   ],
@@ -11,7 +11,7 @@
     "html5",
     "hybrid"
   ],
-  "homepage": "https://github.com/driftyco/ionic-monitor",
+  "homepage": "https://github.com/driftyco/ionic-error-tracking",
   "ignore": [
     "**/.*",
     "node_modules",

@@ -10,7 +10,7 @@ interface Ionic {
 
   const queue: any[] = [];
   let timerId: any;
-  let deviceInfo: any;
+  let deviceInfo: any = getBrowserInfo();
   let appId = getAppId();
   let devMode = getIsDevMode();
   let apiUrl = getApiUrl();
@@ -71,10 +71,15 @@ interface Ionic {
     }
     queue.push(err);
 
-    clearTimeout(timerId);
-    timerId = setTimeout(() => {
-      drainQueue();
-    }, 1000);
+    if(!timerId) {
+      // If we haven't set a timeout to drain, do it now
+      // This means every N seconds we'll do a batch but not ever
+      // wait more than N seconds to avoid crazy situations where
+      // an exception repeats and we keep delaying the timer
+      timerId = setTimeout(() => {
+        drainQueue();
+      }, 2000);
+    }
   }
 
   function handleNewError(err: any) {
@@ -102,6 +107,8 @@ interface Ionic {
   }
 
   function drainQueue() {
+    clearTimeout(timerId);
+
     let framework = window.angular ? 'angular1' : 'angular2';
 
     window.fetch(apiUrl + '/tracking/exceptions', {

@@ -1,0 +1,22 @@
+{
+  "name": "ionic-error-tracking",
+  "description": "Ionic tracking client for Ionic apps",
+  "main": "dist/ion-monitor.js",
+  "authors": [
+    "Ionic Team <hi@ionic.io> (http://ionic.io)"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "ionic",
+    "html5",
+    "hybrid"
+  ],
+  "homepage": "https://github.com/driftyco/ionic-monitor",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

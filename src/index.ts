@@ -108,6 +108,7 @@ interface Ionic {
 
   function drainQueue() {
     clearTimeout(timerId);
+    timerId = null;
 
     let framework = window.angular ? 'angular1' : 'angular2';
 

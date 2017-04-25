@@ -1,7 +1,7 @@
-# ionic-monitor
+# ionic-error-tracking client
 
 1) `npm run build`
 
-2) Copy `dist/ion-monitor.js` to your test project
+2) Copy `dist/ion-error-tracking.js` to your test project
 
-3) First script to run in the index.html file should be ion-monitor.js
+3) the ion-error-tracking.js include should come after the Ionic bundle and Cordova in index.html file

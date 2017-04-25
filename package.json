@@ -1,5 +1,5 @@
 {
-  "name": "@ionic/monitor",
+  "name": "@ionic/error-tracking",
   "version": "0.0.1",
   "homepage": "http://ionicframework.com/",
   "author": "Ionic Team <hi@ionic.io> (http://ionic.io)",
@@ -12,10 +12,10 @@
   "scripts": {
     "build": "npm run clean && tsc && npm run concat && npm run minify",
     "concat": "cat node_modules/tracekit/tracekit.js dist/index.js > dist/bundle.js",
-    "minify": "uglifyjs dist/bundle.js -o dist/ion-monitor.js --compress --mangle && rm dist/index.js",
+    "minify": "uglifyjs dist/bundle.js -o dist/ion-error-tracking.js --compress --mangle && rm dist/index.js",
     "clean": "rimraf ./dist"
   },
-  "main": "dist/ion-monitor.js",
+  "main": "dist/ion-error-tracking.js",
   "devDependencies": {
     "rimraf": "^2.6.1",
     "tracekit": "^0.4.4",
@@ -24,10 +24,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/driftyco/ionic-monitor.git"
+    "url": "git+https://github.com/driftyco/ionic-error-tracking.git"
   },
   "bugs": {
-    "url": "https://github.com/driftyco/ionic-monitor/issues"
+    "url": "https://github.com/driftyco/ionic-error-tracking/issues"
   },
   "dependencies": {
     "tracekit": "^0.4.4"

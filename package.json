@@ -24,10 +24,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/driftyco/ionic-error-tracking.git"
+    "url": "git+https://github.com/ionic-team/ionic-error-tracking.git"
   },
   "bugs": {
-    "url": "https://github.com/driftyco/ionic-error-tracking/issues"
+    "url": "https://github.com/ionic-team/ionic-error-tracking/issues"
   },
   "dependencies": {
     "tracekit": "^0.4.4"

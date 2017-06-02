@@ -1331,7 +1331,7 @@ if (typeof module !== 'undefined' && module.exports && window.module !== module)
         clearTimeout(timerId);
         timerId = null;
         var framework = window.angular ? 'angular1' : 'angular2';
-        window.fetch(apiUrl + '/tracking/exceptions', {
+        window.fetch(apiUrl + '/monitoring/exceptions', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

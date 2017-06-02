@@ -112,7 +112,7 @@ interface Ionic {
 
     let framework = window.angular ? 'angular1' : 'angular2';
 
-    window.fetch(apiUrl + '/tracking/exceptions', {
+    window.fetch(apiUrl + '/monitoring/exceptions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

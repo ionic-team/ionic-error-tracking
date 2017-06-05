@@ -1244,11 +1244,13 @@ if (typeof module !== 'undefined' && module.exports && window.module !== module)
 }(typeof window !== 'undefined' ? window : global));
 (function (window) {
     var ionic = window.Ionic = window.Ionic || {};
+    var ourScriptElement = getScriptElement();
     var queue = [];
     var timerId;
     var deviceInfo = getBrowserInfo();
     var appId = getAppId();
     var devMode = getIsDevMode();
+    var codeVersion = getProvidedCodeVersion();
     var apiUrl = getApiUrl();
     console.log('Ionic Error Logging - App: ', appId, ' Dev mode?', devMode);
     if (window.cordova) {
@@ -1279,12 +1281,16 @@ if (typeof module !== 'undefined' && module.exports && window.module !== module)
         }
     }
     function getAppId() {
-        var script = getScriptElement();
+        var script = ourScriptElement;
         return script && script.getAttribute('data-app-id');
     }
     function getIsDevMode() {
-        var script = getScriptElement();
+        var script = ourScriptElement;
         return script && (script.getAttribute('data-dev') === "true");
+    }
+    function getProvidedCodeVersion() {
+        var script = ourScriptElement;
+        return script && script.getAttribute('data-app-version');
     }
     function getApiUrl() {
         if (getIsDevMode()) {
@@ -1331,17 +1337,21 @@ if (typeof module !== 'undefined' && module.exports && window.module !== module)
         clearTimeout(timerId);
         timerId = null;
         var framework = window.angular ? 'angular1' : 'angular2';
+        var payload = {
+            app_id: appId,
+            framework: framework,
+            device: deviceInfo,
+            errors: queue.slice()
+        };
+        console.log('Sending errors to server', payload);
         window.fetch(apiUrl + "/monitoring/" + appId + "/exceptions", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                app_id: appId,
-                framework: framework,
-                device: deviceInfo,
-                errors: queue.slice()
-            })
+            body: JSON.stringify(payload)
+        }).catch(function (ex) {
+            console.error('Unable to send exception to server', ex);
         });
         queue.length = 0;
     }
@@ -1364,7 +1374,9 @@ if (typeof module !== 'undefined' && module.exports && window.module !== module)
     // Collect device information, including native device data if available
     function getDeviceInfo() {
         return new Promise(function (resolve, reject) {
-            var info = {};
+            var info = {
+                version: codeVersion
+            };
             // Try to grab some device info
             var d = window.device;
             if (d) {
@@ -1382,6 +1394,9 @@ if (typeof module !== 'undefined' && module.exports && window.module !== module)
             // Grab app info from the native side
             if (!window.IonicCordovaCommon) {
                 return resolve(info);
+            }
+            else {
+                console.error('the ionic-cordova-common plugin is not installed. Source Mapping will not work for exceptions. Make sure to install this plugin for full exception reporting');
             }
             window.IonicCordovaCommon.getAppInfo(function (appInfo) {
                 var newInfo = Object.assign(info, appInfo);

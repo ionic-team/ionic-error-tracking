@@ -8,11 +8,14 @@ interface Ionic {
 
   const ionic: Ionic = window.Ionic = window.Ionic || {};
 
+  const ourScriptElement = getScriptElement();
+
   const queue: any[] = [];
   let timerId: any;
   let deviceInfo: any = getBrowserInfo();
   let appId = getAppId();
   let devMode = getIsDevMode();
+  let codeVersion = getProvidedCodeVersion();
   let apiUrl = getApiUrl();
 
   console.log('Ionic Error Logging - App: ', appId, ' Dev mode?', devMode);
@@ -48,13 +51,18 @@ interface Ionic {
   }
 
   function getAppId() {
-    let script = getScriptElement();
+    const script = ourScriptElement;
     return script && script.getAttribute('data-app-id');
   }
 
   function getIsDevMode() {
-    let script = getScriptElement();
+    const script = ourScriptElement;
     return script && (script.getAttribute('data-dev') === "true")
+  }
+
+  function getProvidedCodeVersion() {
+    const script = ourScriptElement;
+    return script && script.getAttribute('data-app-version');
   }
 
   function getApiUrl() {
@@ -112,17 +120,23 @@ interface Ionic {
 
     let framework = window.angular ? 'angular1' : 'angular2';
 
+    const payload = {
+      app_id: appId,
+      framework: framework,
+      device: deviceInfo,
+      errors: queue.slice()
+    }
+
+    console.log('Sending errors to server', payload)
+
     window.fetch(`${apiUrl}/monitoring/${appId}/exceptions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        app_id: appId,
-        framework: framework,
-        device: deviceInfo,
-        errors: queue.slice()
-      })
+      body: JSON.stringify(payload)
+    }).catch((ex:any) => {
+      console.error('Unable to send exception to server', ex)
     });
 
     queue.length = 0;
@@ -148,10 +162,12 @@ interface Ionic {
   // Collect device information, including native device data if available
   function getDeviceInfo() {
     return new Promise((resolve, reject) => {
-      var info = {};
+      let info: any = {
+        version: codeVersion
+      };
 
       // Try to grab some device info
-      var d = window.device;
+      let d = window.device;
       if(d) {
         info = {
           model: d.model,
@@ -169,6 +185,8 @@ interface Ionic {
       // Grab app info from the native side
       if(!window.IonicCordovaCommon) {
         return resolve(info);
+      } else {
+        console.error('the ionic-cordova-common plugin is not installed. Source Mapping will not work for exceptions. Make sure to install this plugin for full exception reporting')
       }
 
       window.IonicCordovaCommon.getAppInfo((appInfo: any) => {

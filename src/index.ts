@@ -3,7 +3,7 @@ interface Ionic {
   handleNewError: {(error: any): void};
 }
 
-declare var window:any;
+(function(window:any) {
 
 const ionic: Ionic = window.Ionic = window.Ionic || {};
 
@@ -215,4 +215,4 @@ if(window.angular) {
   }]);
 }
 
-export { handleNewError, handleError }
+})(window);

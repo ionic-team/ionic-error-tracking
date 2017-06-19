@@ -2,7 +2,7 @@
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
     "lib": ["dom", "es2015"],
-    "module": "es2015",
+    "module": "commonjs",
     "outDir": "dist/",
     "target": "es5",
     "compileOnSave": false,

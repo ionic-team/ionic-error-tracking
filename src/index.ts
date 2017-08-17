@@ -16,8 +16,12 @@ let appId = getAppId();
 let devMode = getIsDevMode();
 let codeVersion = getProvidedCodeVersion();
 let apiUrl = getApiUrl();
+let uid = getUid();
+
+identify();
 
 console.log('Ionic Error Logging - App: ', appId, ' Dev mode?', devMode);
+console.log('UID', uid);
 
 if(window.cordova) {
   document.addEventListener('deviceready', () => {
@@ -38,6 +42,35 @@ window.TraceKit.remoteFetching = false;
 window.TraceKit.report.subscribe(function(errorReport: any) {
   handleError(errorReport);
 });
+
+function uuidv4() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
+function getUid() {
+  let uid = window.localStorage.getItem('_iouid')
+  if(!uid) {
+    uid = uuidv4();
+    window.localStorage.setItem('_iouid', uid)
+  }
+  return uid;
+}
+
+function identify() {
+  window.fetch(`${apiUrl}/monitoring/${appId}/u`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+        enduser_id: uid
+    })
+  }).catch((ex:any) => {
+  });
+}
 
 function getScriptElement() {
   let scripts = document.querySelectorAll('script');

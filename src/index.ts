@@ -13,25 +13,24 @@ const queue: any[] = [];
 let timerId: any;
 let deviceInfo: any = getBrowserInfo();
 let appId = getAppId();
-let devMode = getIsDevMode();
+// let devMode = getIsDevMode();
 let codeVersion = getProvidedCodeVersion();
 let apiUrl = getApiUrl();
 let uid = getUid();
 
-identify();
-
-console.log('Ionic Error Logging - App: ', appId, ' Dev mode?', devMode);
-console.log('UID', uid);
+console.log('Ionic Error Logging initializing for app', appId);
 
 if(window.cordova) {
   document.addEventListener('deviceready', () => {
     getDeviceInfo().then((info: any) => {
+      identify(info);
       deviceInfo = info;
     });
   });
 } else {
   window.addEventListener('load', () => {
     getDeviceInfo().then((info: any) => {
+      identify(info);
       deviceInfo = info;
     });
   });
@@ -42,6 +41,13 @@ window.TraceKit.remoteFetching = false;
 window.TraceKit.report.subscribe(function(errorReport: any) {
   handleError(errorReport);
 });
+
+function postJson(url: string, data: any) {
+  var xmlhttp = new XMLHttpRequest();
+  xmlhttp.open("POST", url);
+  xmlhttp.setRequestHeader("Content-Type", "application/json");
+  xmlhttp.send(JSON.stringify(data));
+}
 
 function uuidv4() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -59,16 +65,13 @@ function getUid() {
   return uid;
 }
 
-function identify() {
-  window.fetch(`${apiUrl}/monitoring/${appId}/u`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-        enduser_id: uid
-    })
-  }).catch((ex:any) => {
+function identify(info: any) {
+  postJson(`${apiUrl}/monitoring/${appId}/u`, {
+    enduser_id: uid,
+    os_version: info.osVersion || '',
+    device: info.model || '',
+    platform: info.platform || info.browserPlatform,
+    user_agent: info.browserUserAgent
   });
 }
 
@@ -161,15 +164,7 @@ function drainQueue() {
 
   console.log('Sending errors to server', payload)
 
-  window.fetch(`${apiUrl}/monitoring/${appId}/exceptions`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(payload)
-  }).catch((ex:any) => {
-    console.error('Unable to send exception to server', ex)
-  });
+  postJson(`${apiUrl}/monitoring/${appId}/exceptions`, payload);
 
   queue.length = 0;
 }
